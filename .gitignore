@@ -1,0 +1,17 @@
+## User settings
+xcuserdata/
+
+## Mac OS
+.DS_Store
+
+## Swift Package Manager
+.build/
+Packages/
+Package.resolved
+
+## Xcode
+build/
+DerivedData/
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
