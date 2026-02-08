@@ -30,11 +30,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		ECCAF7782F38271E00D588A6 /* YTTracker */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = YTTracker;
-			sourceTree = "<group>";
-		};
 		ECCAF7882F38271F00D588A6 /* YTTrackerTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = YTTrackerTests;
@@ -43,6 +38,41 @@
 		ECCAF7922F38271F00D588A6 /* YTTrackerUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = YTTrackerUITests;
+			sourceTree = "<group>";
+		};
+		ECCAF7A32F382D0B00D588A6 /* App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = App;
+			sourceTree = "<group>";
+		};
+		ECCAF7A52F382D1600D588A6 /* Models */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Models;
+			sourceTree = "<group>";
+		};
+		ECCAF7A62F382D1C00D588A6 /* ViewModels */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		ECCAF7A72F382D2900D588A6 /* Views */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Views;
+			sourceTree = "<group>";
+		};
+		ECCAF7A82F382D3400D588A6 /* Services */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Services;
+			sourceTree = "<group>";
+		};
+		ECCAF7A92F382D3D00D588A6 /* Utilities */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		ECCAF7AA2F382D4A00D588A6 /* Resources */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,7 +105,13 @@
 		ECCAF76D2F38271E00D588A6 = {
 			isa = PBXGroup;
 			children = (
-				ECCAF7782F38271E00D588A6 /* YTTracker */,
+				ECCAF7AA2F382D4A00D588A6 /* Resources */,
+				ECCAF7A92F382D3D00D588A6 /* Utilities */,
+				ECCAF7A82F382D3400D588A6 /* Services */,
+				ECCAF7A72F382D2900D588A6 /* Views */,
+				ECCAF7A62F382D1C00D588A6 /* ViewModels */,
+				ECCAF7A52F382D1600D588A6 /* Models */,
+				ECCAF7A32F382D0B00D588A6 /* App */,
 				ECCAF7882F38271F00D588A6 /* YTTrackerTests */,
 				ECCAF7922F38271F00D588A6 /* YTTrackerUITests */,
 				ECCAF7772F38271E00D588A6 /* Products */,
@@ -108,7 +144,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				ECCAF7782F38271E00D588A6 /* YTTracker */,
+				ECCAF7A32F382D0B00D588A6 /* App */,
+				ECCAF7A52F382D1600D588A6 /* Models */,
+				ECCAF7A62F382D1C00D588A6 /* ViewModels */,
+				ECCAF7A72F382D2900D588A6 /* Views */,
+				ECCAF7A82F382D3400D588A6 /* Services */,
+				ECCAF7A92F382D3D00D588A6 /* Utilities */,
+				ECCAF7AA2F382D4A00D588A6 /* Resources */,
 			);
 			name = YTTracker;
 			packageProductDependencies = (

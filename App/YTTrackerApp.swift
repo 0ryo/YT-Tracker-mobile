@@ -6,17 +6,21 @@
 //
 
 import SwiftUI
-import SwiftData
+import SwiftData // フレームワークを導入
 
 @main
 struct YTTrackerApp: App {
+    // アプリ全域で使用するためのモデルコンテナを作成する
     var sharedModelContainer: ModelContainer = {
+        // スキーマとモデルコンフィグを作成する
         let schema = Schema([
             Item.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
+        // モデルコンテナを作成できなければ、致命的なエラーでアプリを終了
         do {
+            // スキーマとモデルコンフィグを指定し、モデルコンテナを初期化して返す。
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
@@ -27,6 +31,6 @@ struct YTTrackerApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(sharedModelContainer)
+        .modelContainer(sharedModelContainer) // アプリのビュー階層トップで、作成したモデルコンテナを接続。
     }
 }
