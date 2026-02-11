@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import Combine
 
 // @MainActor: UIに関わる更新をメインスレッドで行うことを保証する属性
 @MainActor
