@@ -41,7 +41,7 @@ struct DashboardView: View {
                             // NavigationLink(行き先) { 見た目 }
                             NavigationLink{
                                 // 行き先（まだ作っていないので仮置き）
-                                Text("詳細画面: \(channel.title)")
+                                ChannelDetailView(channel: channel)
                             } label: {
                                 ChannelCardView(
                                     channel: channel,

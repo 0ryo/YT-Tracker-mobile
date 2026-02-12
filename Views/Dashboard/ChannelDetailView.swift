@@ -12,6 +12,7 @@ struct ChannelDetailView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
+                // 1. ヘッダー部分
                 HStack(spacing: 16) {
                     // アイコン画像
                     AsyncImage(url: URL(string: channel.thumbnailURL)) { image in
@@ -23,10 +24,52 @@ struct ChannelDetailView: View {
                         Circle()
                             .fill(Color.gray.opacity(0.3))
                     }
-                    .frame(width: 60, height: 60)
+                    .frame(width: 80, height: 80)
                     .clipShape(Circle())
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(channel.title)
+                            .font(.title2.bold())
+                        
+                        Text(channel.customURL ?? channel.channelId)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        
+                        Text("記録数: \(channel.stats.count)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding(.top, 4)
+                    }
+                    Spacer()
                 }
+                .padding()
+                
+                // 2. グラフ表示エリア
+                VStack {
+                    Text("ここに履歴リストが入ります。")
+                        .foregroundStyle(.secondary)
+                }
+                .frame(height: 100)
             }
         }
+        .navigationTitle("詳細情報")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+#Preview {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: Channel.self, configurations: config)
+    
+    let dummy = Channel(
+        channelId: "UC_TEST",
+        title: "HikakinTV",
+        thumbnailURL: "https://yt3.googleusercontent.com/ytc/AIdro_k2L0Zg...", // 適当なURL
+        customURL: "@hikakin"
+    )
+    
+    return NavigationStack {
+        ChannelDetailView(channel: dummy)
+            .modelContainer(container)
     }
 }
