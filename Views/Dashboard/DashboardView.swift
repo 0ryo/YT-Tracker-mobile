@@ -12,7 +12,7 @@ struct DashboardView: View {
     @State private var showAddSheet = false
     
     // APIキー。とりあえずUserDefaultsから取得。なければ空文字。
-    private let apiKey = UserDefaults.standard.string(forKey: "apiKey") ?? ""
+    private let apiKey = "AIzaSyBJCiCL74G48uuX389coli61wxPf2VO7wg"
     
     // 外部から受け取ったmodelContextを使って店長(ViewModel)を雇うための定型文
     init(modelContext: ModelContext) {
@@ -70,8 +70,8 @@ struct DashboardView: View {
                 }
             }
             .sheet(isPresented: $showAddSheet) {
-                // あとで作る
-                Text("チャンネル追加画面(予定)")
+                // ViewModelとAPIキーを渡す
+               AddChannelSheet(viewModel: viewModel, apiKey: apiKey)
                     .presentationDetents([.medium])
             }
         }

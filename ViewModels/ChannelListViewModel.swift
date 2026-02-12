@@ -35,8 +35,11 @@ class ChannelListViewModel: ObservableObject {
     
     // チャンネル追加処理
     func addChannel(input: String, apiKey: String) async {
+        let cleanInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        
         // guard文: 入力が空なら何もしない。
-        guard !input.isEmpty, !apiKey.isEmpty else { return }
+        guard !cleanInput.isEmpty, !cleanKey.isEmpty else { return }
         
         isLoading = true
         defer { isLoading = false } // 処理が終わったら必ず(エラーでも成功でも)falseにする。
@@ -44,7 +47,7 @@ class ChannelListViewModel: ObservableObject {
         do {
             // 1. APIからデータを取得(/Services/を使う。)
             // ここで`item`にはYouTubeChannelItem型のデータが入る。
-            let item = try await apiService.fetchChannel(input: input, apiKey: apiKey)
+            let item = try await apiService.fetchChannel(input: cleanInput, apiKey: cleanKey)
             
             // 2. 重複チェック(すでに同じChannelIdのチャンネルがないか確認)
             // $0.channelIdは保存済みのデータのID、item.idは今撮ってきたAPIのID

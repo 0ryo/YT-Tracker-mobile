@@ -30,8 +30,10 @@ struct YTTrackerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            let context = ModelContext(sharedModelContainer)
+            DashboardView(modelContext: context)
         }
-//        .modelContainer(sharedModelContainer) // アプリのビュー階層トップで、作成したモデルコンテナを接続。
+        .modelContainer(sharedModelContainer) // アプリのビュー階層トップで、作成したモデルコンテナを接続。
     }
 }
+
