@@ -9,6 +9,11 @@ struct ChannelDetailView: View {
     // 前の画面から渡されるチャンネルデータ
     let channel: Channel
     
+    // 日付順にソートした統計データ
+    var sortedStats: [ChannelStats] {
+        channel.stats.sorted { $0.recordedAt < $1.recordedAt }
+    }
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
@@ -45,11 +50,28 @@ struct ChannelDetailView: View {
                 .padding()
                 
                 // 2. グラフ表示エリア
-                VStack {
-                    Text("ここに履歴リストが入ります。")
+                if sortedStats.isEmpty {
+                    Text("データがありません。")
                         .foregroundStyle(.secondary)
+                        .padding()
+                } else {
+                    VStack(spacing: 20) {
+                        StatsChartView(
+                            stats: sortedStats,
+                            keyPath: \.subscribers,
+                            title: "チャンネル登録者数",
+                            color: .red
+                        )
+                        
+                        StatsChartView(
+                            stats: sortedStats,
+                            keyPath: \.views,
+                            title: "総再生回数",
+                            color: .blue
+                        )
+                    }
+                    .padding(.horizontal)
                 }
-                .frame(height: 100)
             }
         }
         .navigationTitle("詳細情報")
