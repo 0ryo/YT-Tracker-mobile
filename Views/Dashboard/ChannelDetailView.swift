@@ -72,6 +72,10 @@ struct ChannelDetailView: View {
                     }
                     .padding(.horizontal)
                 }
+                
+                HistoryListView(stats: channel.stats)
+                    .padding(.horizontal)
+                    .padding(.bottom, 40)
             }
         }
         .navigationTitle("詳細情報")
