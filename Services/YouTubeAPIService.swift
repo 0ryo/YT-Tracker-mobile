@@ -2,7 +2,7 @@ import Foundation
 
 //actor: 複数の場所から同時に呼ばれてもデータが壊れない安全なクラス
 actor YouTubeAPIService {
-    private let baseURL = "https//:www.googleapis.com/youtube/v3/channels"
+    private let baseURL = "https://www.googleapis.com/youtube/v3/channels"
     
     // エラーの種類を定義
     enum APIError: Error {
