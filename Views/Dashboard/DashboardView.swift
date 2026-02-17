@@ -69,7 +69,16 @@ struct DashboardView: View {
                         Image(systemName: "gearshape")
                     }
                 }
-                ToolbarItem(placement: .primaryAction) {
+                ToolbarItemGroup(placement: .primaryAction) {
+                    Button{
+                        Task {
+                            await viewModel.updateAllChannels(apiKey: apiKey)
+                        }
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                            .symbolEffect(.bounce, value: viewModel.isUpdating)
+                    }
+                    .disabled(viewModel.isUpdating || viewModel.channels.isEmpty)
                     Button {
                         showAddSheet = true
                     } label: {
