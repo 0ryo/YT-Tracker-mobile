@@ -10,9 +10,10 @@ struct DashboardView: View {
     
     // 2. 状態管理
     @State private var showAddSheet = false
+    @State private var showSettingsSheet = false
     
-    // APIキー。とりあえずUserDefaultsから取得。なければ空文字。
-    private let apiKey = "AIzaSyBJCiCL74G48uuX389coli61wxPf2VO7wg"
+    // UserDefaultsから取得する。
+    @AppStorage("yttracker_api_key") private var apiKey = ""
     
     // 外部から受け取ったmodelContextを使って店長(ViewModel)を雇うための定型文
     init(modelContext: ModelContext) {
@@ -63,11 +64,21 @@ struct DashboardView: View {
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
+                        showSettingsSheet = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
                         showAddSheet = true
                     } label: {
                         Image(systemName: "plus")
                     }
                 }
+            }
+            .sheet(isPresented: $showSettingsSheet) {
+               SettingsView()
             }
             .sheet(isPresented: $showAddSheet) {
                 // ViewModelとAPIキーを渡す
