@@ -77,7 +77,10 @@ struct DashboardView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showSettingsSheet) {
+            .sheet(isPresented: $showSettingsSheet, onDismiss: {
+                // 設定画面が閉じた時に、データを再読み込みする
+                viewModel.fetchChannels()
+            }) {
                SettingsView()
             }
             .sheet(isPresented: $showAddSheet) {

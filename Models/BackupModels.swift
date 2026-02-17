@@ -26,5 +26,5 @@ struct BackupStat: Codable {
     let views: Int
     let subscribers: Int
     let videoCount: Int
-    let recordeAt: Date
+    let recordedAt: Date
 }
