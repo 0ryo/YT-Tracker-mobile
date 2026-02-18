@@ -10,6 +10,7 @@ class ChannelListViewModel: ObservableObject {
     @Published var isLoading =  false
     @Published var errorMessage: String?
     @Published var showError = false
+    @Published var isUpdating = false
     
     // Dependencies(依存する機能)
     private let apiService = YouTubeAPIService()
@@ -88,6 +89,65 @@ class ChannelListViewModel: ObservableObject {
         } catch {
             self.errorMessage = error.localizedDescription
             self.showError = true
+        }
+    }
+    
+    // チャンネルデータ更新機能
+    func updateAllChannels(apiKey: String) async {
+        guard !apiKey.isEmpty, !channels.isEmpty else { return }
+        
+        isUpdating = true
+        defer { isUpdating = false }
+        
+        // 1つずつ順番にAPIを叩く
+        // ToDo: 並列処理やバッチリクエストにすることで高速化する。
+        for channel in channels {
+            do {
+                let item = try await apiService.fetchChannel(input: channel.channelId, apiKey: apiKey)
+                
+                updateChannelStats(channel: channel, item: item)
+            } catch {
+                print("Failed to update \(channel.title): \(error)")
+                // 1つ失敗しても他は続けるため、ここでreturnしない。
+            }
+        }
+        
+        try? modelContext.save()
+        fetchChannels()
+    }
+    
+    private func updateChannelStats(channel: Channel, item: YouTubeChannelItem) {
+        let currentViews = Int(item.statistics.viewCount) ?? 0
+        let currentSubscribers = Int(item.statistics.subscriberCount) ?? 0
+        let currentVideoCount = Int(item.statistics.videoCount) ?? 0
+        let now = Date()
+        
+        // チャンネル情報の更新(チャンネル名やアイコンが変わっている可能性があるため。)
+        channel.title = item.snippet.title
+        channel.thumbnailURL = item.snippet.thumbnails.default.url
+        channel.customURL = item.snippet.customUrl
+        channel.lastUpdated = now
+        
+        // 今日のデータがすでに存在するかチェック
+        let calendar = Calendar.current
+        
+        if let existingStat = channel.stats.first(where: {stat in
+            calendar.isDate(stat.recordedAt, inSameDayAs: now)
+        }) {
+            // 上書きする場合
+            existingStat.views = currentViews
+            existingStat.subscribers = currentSubscribers
+            existingStat.videoCount = currentVideoCount
+            existingStat.recordedAt = now
+        } else {
+            // 上書きしない場合
+            let newStat = ChannelStats(
+                views: currentViews,
+                subscribers: currentSubscribers,
+                videoCount: currentVideoCount,
+                recordedAt: now
+            )
+            newStat.channel = channel
         }
     }
     
