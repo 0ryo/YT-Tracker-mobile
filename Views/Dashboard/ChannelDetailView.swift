@@ -9,6 +9,14 @@ struct ChannelDetailView: View {
     // 前の画面から渡されるチャンネルデータ
     let channel: Channel
     
+    // モード定義
+    enum DisplayMode: String, CaseIterable {
+        case subscribers = "登録者数"
+        case views = "再生回数"
+    }
+    
+    @State private var selection: DisplayMode = .subscribers
+    
     // 日付順にソートした統計データ
     var sortedStats: [ChannelStats] {
         channel.stats.sorted { $0.recordedAt < $1.recordedAt }
@@ -49,31 +57,43 @@ struct ChannelDetailView: View {
                 }
                 .padding()
                 
+                // Picker
+                Picker("表示モード", selection: $selection) {
+                    ForEach(DisplayMode.allCases, id: \.self) { mode in
+                        Text(mode.rawValue).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+                
                 // 2. グラフ表示エリア
                 if sortedStats.isEmpty {
                     Text("データがありません。")
                         .foregroundStyle(.secondary)
                         .padding()
                 } else {
-                    VStack(spacing: 20) {
+                    if selection == .subscribers {
                         StatsChartView(
                             stats: sortedStats,
                             keyPath: \.subscribers,
                             title: "チャンネル登録者数",
                             color: .red
                         )
-                        
+                        .padding(.horizontal)
+                        .transition(.opacity)
+                    } else {
                         StatsChartView(
                             stats: sortedStats,
                             keyPath: \.views,
                             title: "総再生回数",
                             color: .blue
                         )
+                        .padding(.horizontal)
+                        .transition(.opacity)
                     }
-                    .padding(.horizontal)
                 }
                 
-                HistoryListView(stats: channel.stats)
+                HistoryListView(stats: channel.stats, mode: selection)
                     .padding(.horizontal)
                     .padding(.bottom, 40)
             }
