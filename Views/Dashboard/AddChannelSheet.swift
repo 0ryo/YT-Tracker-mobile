@@ -65,8 +65,6 @@ struct AddChannelSheet: View {
                 .cornerRadius(10)
             }
             .disabled(input.isEmpty || viewModel.isLoading)
-            
-            Spacer()
         }
         .padding()
         .toolbar {
