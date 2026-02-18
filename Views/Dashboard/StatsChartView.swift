@@ -12,14 +12,54 @@ struct StatsChartView: View {
     let title: String
     let color: Color
     
+    @State private var selection: ChartRange = .all
+    
+    // フィルタリング済みデータ
+    var filteredStats: [ChannelStats] {
+        guard let days = selection.days else { return stats } // 全期間ならそのまま
+        
+        let cutoffDate = Calendar.current.date(byAdding: .day, value: -days, to:Date())!
+        
+        return stats.filter { $0.recordedAt >= cutoffDate }
+    }
+    
+    // x軸のラベル計算
+    var xAxisValues: [Date] {
+        guard let first = filteredStats.first?.recordedAt,
+              let last = filteredStats.last?.recordedAt,
+              filteredStats.count > 1 else {
+            return filteredStats.map { $0.recordedAt }
+        }
+        
+        let duration = last.timeIntervalSince(first)
+        
+        let step = duration / 6
+        
+        return (0...6).map { i in
+            first.addingTimeInterval(step * Double(i))
+        }
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(title)
-                .font(.headline)
+            HStack {
+                Text(title)
+                    .font(.headline)
+                Spacer()
+                Picker("期間", selection: $selection) {
+                    ForEach(ChartRange.allCases, id: \.self) { range in
+                        Text(range.rawValue).tag(range)
+                    }
+                }
+                .pickerStyle(.menu)
+                .labelsHidden()
+                .frame(width: 200, alignment: .trailing)
+                .border(Color.red)
+            }
             
             // グラフ本体
             Chart {
-                ForEach(stats) { stat in
+                ForEach(filteredStats) { stat in
                     LineMark(
                         x: .value("日付", stat.recordedAt),
                         y: .value("数値", stat[keyPath: keyPath])
@@ -38,15 +78,15 @@ struct StatsChartView: View {
             
             // X軸の表示設定
             .chartXAxis {
-                AxisMarks(values: .stride(by: .day)) { value in
-                    AxisValueLabel(format: .dateTime.month().day())
+                AxisMarks(values: xAxisValues) { value in
+                    AxisValueLabel(format: .dateTime.month(.defaultDigits).day())
                     AxisGridLine()
                 }
             }
             .chartYAxis {
                 AxisMarks{ value in
-                    AxisValueLabel()
                     AxisGridLine()
+                    AxisValueLabel(format: Decimal.FormatStyle.number.notation(.compactName))
                 }
             }
         }
@@ -57,31 +97,39 @@ struct StatsChartView: View {
     }
 }
 
-#Preview {
-    // ダミーデータ作成
-    let stats = [
-        ChannelStats(views: 100, subscribers: 10, videoCount: 1, recordedAt: Date().addingTimeInterval(-86400 * 2)), // 2日前
-        ChannelStats(views: 150, subscribers: 12, videoCount: 1, recordedAt: Date().addingTimeInterval(-86400)),     // 1日前
-        ChannelStats(views: 200, subscribers: 15, videoCount: 2, recordedAt: Date())                                 // 今日
-    ]
+enum ChartRange: String, CaseIterable {
+    case week = "1週間"
+    case month = "1ヶ月"
+    case threeMonths = "3ヶ月"
+    case all = "全期間"
     
-    return VStack {
-        // 登録者数のグラフ（赤）
-        StatsChartView(
-            stats: stats,
-            keyPath: \.subscribers,
-            title: "登録者数",
-            color: .red
-        )
-        
-        // 再生回数のグラフ（青）
-        StatsChartView(
-            stats: stats,
-            keyPath: \.views,
-            title: "再生回数",
-            color: .blue
+    var days: Int? {
+        switch self {
+        case .week: return 7
+        case .month: return 30
+        case .threeMonths: return 90
+        case .all: return nil
+        }
+    }
+}
+
+#Preview {
+    // 3ヶ月分くらいのダミーデータを作成してテストすると分かりやすいです
+    let stats = (0..<100).map { i in
+        ChannelStats(
+            views: 10000 + i * 100,
+            subscribers: 100 + i,
+            videoCount: 10,
+            recordedAt: Date().addingTimeInterval(-86400 * Double(99 - i))
         )
     }
+    
+    return StatsChartView(
+        stats: stats,
+        keyPath: \.views,
+        title: "テストグラフ",
+        color: .blue
+    )
     .padding()
     .background(Color(.secondarySystemBackground))
 }
