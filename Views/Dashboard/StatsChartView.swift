@@ -40,6 +40,38 @@ struct StatsChartView: View {
         }
     }
     
+    // y軸の表示範囲を計算
+    var yAxisDomain: ClosedRange<Int> {
+        // 表示する値のリストを取り出す
+        let values = filteredStats.map{
+            $0[keyPath: keyPath]
+        }
+        
+        //値がないときはとりあえず0〜1を渡す
+        guard let minVal = values.min(),
+              let maxVal = values.max() else { return 0...1 }
+        
+        //　範囲
+        let range = Double(maxVal - minVal)
+        
+        
+        // 余白
+        let margin = range == 0 ? Double(maxVal) * 0.2 : range * 0.2
+        
+        // 下限
+        let lower = Int(max(0, Double(minVal) - margin))
+        
+        // 上限
+        let upper = Int(Double(maxVal) + margin)
+        
+        // 同じ値だとクラッシュするため、最低でも幅を持たせる
+        if lower == upper {
+            return 0...max(1, upper)
+        }
+        
+        return lower...upper
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -52,9 +84,7 @@ struct StatsChartView: View {
                     }
                 }
                 .pickerStyle(.menu)
-                .labelsHidden()
                 .frame(width: 200, alignment: .trailing)
-                .border(Color.red)
             }
             
             // グラフ本体
@@ -75,6 +105,7 @@ struct StatsChartView: View {
                 }
             }
             .frame(height: 200)
+            .chartYScale(domain: yAxisDomain)
             
             // X軸の表示設定
             .chartXAxis {
@@ -98,9 +129,9 @@ struct StatsChartView: View {
 }
 
 enum ChartRange: String, CaseIterable {
-    case week = "1週間"
-    case month = "1ヶ月"
-    case threeMonths = "3ヶ月"
+    case week = "今週"
+    case month = "先月"
+    case threeMonths = "直近3ヶ月"
     case all = "全期間"
     
     var days: Int? {
@@ -117,7 +148,7 @@ enum ChartRange: String, CaseIterable {
     // 3ヶ月分くらいのダミーデータを作成してテストすると分かりやすいです
     let stats = (0..<100).map { i in
         ChannelStats(
-            views: 10000 + i * 100,
+            views: 1000000 + i * 102230,
             subscribers: 100 + i,
             videoCount: 10,
             recordedAt: Date().addingTimeInterval(-86400 * Double(99 - i))
