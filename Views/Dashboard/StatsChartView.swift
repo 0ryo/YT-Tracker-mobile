@@ -128,22 +128,6 @@ struct StatsChartView: View {
     }
 }
 
-enum ChartRange: String, CaseIterable {
-    case week = "今週"
-    case month = "先月"
-    case threeMonths = "直近3ヶ月"
-    case all = "全期間"
-    
-    var days: Int? {
-        switch self {
-        case .week: return 7
-        case .month: return 30
-        case .threeMonths: return 90
-        case .all: return nil
-        }
-    }
-}
-
 #Preview {
     // 3ヶ月分くらいのダミーデータを作成してテストすると分かりやすいです
     let stats = (0..<100).map { i in
