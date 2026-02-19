@@ -6,7 +6,7 @@ struct DiffChartView: View {
     let mode: ChannelDetailView.DisplayMode // 親のモードを受け取る
     
     // 期間選択の状態
-    @State private var selection: ChartRange = .week // 期間のデフォルト値。
+    @Binding var selection: ChartRange
     
     // 差分データの構造体
     struct DailyDiff: Identifiable {
@@ -75,14 +75,6 @@ struct DiffChartView: View {
                 
                 Spacer()
                 
-                Picker("期間", selection: $selection) {
-                    ForEach(ChartRange.allCases, id: \.self){ range in
-                        Text(range.rawValue).tag(range)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .frame(width: 200)
             }
             
             if diffData.isEmpty {
@@ -123,6 +115,8 @@ struct DiffChartView: View {
 
 // プレビュー
 #Preview {
+    @Previewable @State var range: ChartRange = .week
+
     let stats = (0..<30).map { i in
         ChannelStats(
             views: 10000 + i * 500, // 毎日500増える
@@ -132,7 +126,11 @@ struct DiffChartView: View {
         )
     }
     
-    return DiffChartView(stats: stats, mode: .subscribers)
+    return DiffChartView(
+        stats: stats,
+        mode: .subscribers,
+        selection: $range
+    )
         .padding()
         .background(Color(.secondarySystemBackground))
 }

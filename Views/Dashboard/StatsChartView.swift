@@ -12,7 +12,7 @@ struct StatsChartView: View {
     let title: String
     let color: Color
     
-    @State private var selection: ChartRange = .all
+    @Binding var selection: ChartRange
     
     // フィルタリング済みデータ
     var filteredStats: [ChannelStats] {
@@ -53,8 +53,7 @@ struct StatsChartView: View {
         
         //　範囲
         let range = Double(maxVal - minVal)
-        
-        
+
         // 余白
         let margin = range == 0 ? Double(maxVal) * 0.2 : range * 0.2
         
@@ -83,7 +82,7 @@ struct StatsChartView: View {
                         Text(range.rawValue).tag(range)
                     }
                 }
-                .pickerStyle(.menu)
+                .pickerStyle(.segmented)
                 .frame(width: 200, alignment: .trailing)
             }
             
@@ -129,6 +128,8 @@ struct StatsChartView: View {
 }
 
 #Preview {
+    @Previewable @State var range: ChartRange = .week
+
     // 3ヶ月分くらいのダミーデータを作成してテストすると分かりやすいです
     let stats = (0..<100).map { i in
         ChannelStats(
@@ -143,7 +144,8 @@ struct StatsChartView: View {
         stats: stats,
         keyPath: \.views,
         title: "テストグラフ",
-        color: .blue
+        color: .blue,
+        selection: $range
     )
     .padding()
     .background(Color(.secondarySystemBackground))

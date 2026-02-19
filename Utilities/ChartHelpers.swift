@@ -3,7 +3,7 @@ import Foundation
 enum ChartRange: String, CaseIterable {
     case week = "今週"
     case month = "先月"
-    case threeMonths = "直近3ヶ月"
+    case threeMonths = "3ヶ月"
     case all = "全期間"
     
     var days: Int? {

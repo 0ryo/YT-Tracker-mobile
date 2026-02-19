@@ -16,6 +16,7 @@ struct ChannelDetailView: View {
     }
     
     @State private var selection: DisplayMode = .subscribers
+    @State private var rangeSelection: ChartRange = .week
     
     // 日付順にソートした統計データ
     var sortedStats: [ChannelStats] {
@@ -77,7 +78,8 @@ struct ChannelDetailView: View {
                             stats: sortedStats,
                             keyPath: \.subscribers,
                             title: "チャンネル登録者数",
-                            color: .red
+                            color: .red,
+                            selection: $rangeSelection
                         )
                         .padding(.horizontal)
                         .transition(.opacity)
@@ -86,14 +88,15 @@ struct ChannelDetailView: View {
                             stats: sortedStats,
                             keyPath: \.views,
                             title: "総再生回数",
-                            color: .blue
+                            color: .blue,
+                            selection: $rangeSelection
                         )
                         .padding(.horizontal)
                         .transition(.opacity)
                     }
                 }
 
-                DiffChartView(stats: channel.stats, mode: selection)
+                DiffChartView(stats: channel.stats, mode: selection, selection: $rangeSelection)
                     .padding(.horizontal)
                 
                 HistoryListView(stats: channel.stats, mode: selection)
