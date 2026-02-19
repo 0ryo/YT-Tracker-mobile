@@ -12,14 +12,83 @@ struct StatsChartView: View {
     let title: String
     let color: Color
     
+    @Binding var selection: ChartRange
+    
+    // フィルタリング済みデータ
+    var filteredStats: [ChannelStats] {
+        guard let days = selection.days else { return stats } // 全期間ならそのまま
+        
+        let cutoffDate = Calendar.current.date(byAdding: .day, value: -days, to:Date())!
+        
+        return stats.filter { $0.recordedAt >= cutoffDate }
+    }
+    
+    // x軸のラベル計算
+    var xAxisValues: [Date] {
+        guard let first = filteredStats.first?.recordedAt,
+              let last = filteredStats.last?.recordedAt,
+              filteredStats.count > 1 else {
+            return filteredStats.map { $0.recordedAt }
+        }
+        
+        let duration = last.timeIntervalSince(first)
+        
+        let step = duration / 6
+        
+        return (0...6).map { i in
+            first.addingTimeInterval(step * Double(i))
+        }
+    }
+    
+    // y軸の表示範囲を計算
+    var yAxisDomain: ClosedRange<Int> {
+        // 表示する値のリストを取り出す
+        let values = filteredStats.map{
+            $0[keyPath: keyPath]
+        }
+        
+        //値がないときはとりあえず0〜1を渡す
+        guard let minVal = values.min(),
+              let maxVal = values.max() else { return 0...1 }
+        
+        //　範囲
+        let range = Double(maxVal - minVal)
+
+        // 余白
+        let margin = range == 0 ? Double(maxVal) * 0.2 : range * 0.2
+        
+        // 下限
+        let lower = Int(max(0, Double(minVal) - margin))
+        
+        // 上限
+        let upper = Int(Double(maxVal) + margin)
+        
+        // 同じ値だとクラッシュするため、最低でも幅を持たせる
+        if lower == upper {
+            return 0...max(1, upper)
+        }
+        
+        return lower...upper
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(title)
-                .font(.headline)
+            HStack {
+                Text(title)
+                    .font(.headline)
+                Spacer()
+                Picker("期間", selection: $selection) {
+                    ForEach(ChartRange.allCases, id: \.self) { range in
+                        Text(range.rawValue).tag(range)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 200, alignment: .trailing)
+            }
             
             // グラフ本体
             Chart {
-                ForEach(stats) { stat in
+                ForEach(filteredStats) { stat in
                     LineMark(
                         x: .value("日付", stat.recordedAt),
                         y: .value("数値", stat[keyPath: keyPath])
@@ -35,18 +104,19 @@ struct StatsChartView: View {
                 }
             }
             .frame(height: 200)
+            .chartYScale(domain: yAxisDomain)
             
             // X軸の表示設定
             .chartXAxis {
-                AxisMarks(values: .stride(by: .day)) { value in
-                    AxisValueLabel(format: .dateTime.month().day())
+                AxisMarks(values: xAxisValues) { value in
+                    AxisValueLabel(format: .dateTime.month(.defaultDigits).day())
                     AxisGridLine()
                 }
             }
             .chartYAxis {
                 AxisMarks{ value in
-                    AxisValueLabel()
                     AxisGridLine()
+                    AxisValueLabel(format: Decimal.FormatStyle.number.notation(.compactName))
                 }
             }
         }
@@ -58,30 +128,25 @@ struct StatsChartView: View {
 }
 
 #Preview {
-    // ダミーデータ作成
-    let stats = [
-        ChannelStats(views: 100, subscribers: 10, videoCount: 1, recordedAt: Date().addingTimeInterval(-86400 * 2)), // 2日前
-        ChannelStats(views: 150, subscribers: 12, videoCount: 1, recordedAt: Date().addingTimeInterval(-86400)),     // 1日前
-        ChannelStats(views: 200, subscribers: 15, videoCount: 2, recordedAt: Date())                                 // 今日
-    ]
-    
-    return VStack {
-        // 登録者数のグラフ（赤）
-        StatsChartView(
-            stats: stats,
-            keyPath: \.subscribers,
-            title: "登録者数",
-            color: .red
-        )
-        
-        // 再生回数のグラフ（青）
-        StatsChartView(
-            stats: stats,
-            keyPath: \.views,
-            title: "再生回数",
-            color: .blue
+    @Previewable @State var range: ChartRange = .week
+
+    // 3ヶ月分くらいのダミーデータを作成してテストすると分かりやすいです
+    let stats = (0..<100).map { i in
+        ChannelStats(
+            views: 1000000 + i * 102230,
+            subscribers: 100 + i,
+            videoCount: 10,
+            recordedAt: Date().addingTimeInterval(-86400 * Double(99 - i))
         )
     }
+    
+    return StatsChartView(
+        stats: stats,
+        keyPath: \.views,
+        title: "テストグラフ",
+        color: .blue,
+        selection: $range
+    )
     .padding()
     .background(Color(.secondarySystemBackground))
 }

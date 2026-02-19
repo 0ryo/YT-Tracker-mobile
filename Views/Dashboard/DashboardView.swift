@@ -41,7 +41,7 @@ struct DashboardView: View {
                         ForEach(viewModel.channels) { channel in
                             // NavigationLink(行き先) { 見た目 }
                             NavigationLink{
-                                // 行き先（まだ作っていないので仮置き）
+                                // 行き先
                                 ChannelDetailView(channel: channel)
                             } label: {
                                 ChannelCardView(
@@ -95,7 +95,7 @@ struct DashboardView: View {
             .sheet(isPresented: $showAddSheet) {
                 // ViewModelとAPIキーを渡す
                AddChannelSheet(viewModel: viewModel, apiKey: apiKey)
-                    .presentationDetents([.medium])
+                    .presentationDetents([.height(300)])
             }
         }
     }
