@@ -66,6 +66,11 @@ struct DiffChartView: View {
         }
     }
     
+    // 期間内の合計値を計算
+    var totalPeriodDiff: Int {
+        diffData.reduce(0) { $0 + $1.value }
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // ヘッダー
@@ -74,6 +79,17 @@ struct DiffChartView: View {
                     .font(.headline)
                 
                 Spacer()
+                
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    Text("期間内合計")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    
+                    Text(totalPeriodDiff > 0 ? "+\(totalPeriodDiff.formatted())" : totalPeriodDiff.formatted())
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(mode == .subscribers ? .red : .blue)
+                }
                 
             }
             
