@@ -5,6 +5,8 @@ struct HistoryListView : View {
     
     // 親(ChannelDetailView)からDisplayModeを受け取る。
     let mode: ChannelDetailView.DisplayMode
+    
+    @State private var isExpanded = true
 
     // 新しい順(降順)にソート
     var sortedStats: [ChannelStats] {
@@ -16,49 +18,77 @@ struct HistoryListView : View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // ヘッダー行
-            HStack(spacing: 8) {
-                Text("日付")
-                    .frame(width: dateWidth, alignment: .leading)
-                
-                Text("変動")
-                    .frame(width: badgeWidth, alignment: .trailing)
-                
-                Text(mode == .subscribers ? "登録者数" : "再生回数")
-                    .frame(maxWidth: .infinity, alignment: .trailing)
+            // 折りたたみスイッチ
+            Button {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    isExpanded.toggle()
+                }
+            } label: {
+                HStack {
+                    Text("履歴")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                    Spacer()
+                    
+                    // 開閉に合わせて回転する矢印
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(.secondary)
+                        .rotationEffect(.degrees(isExpanded ? 90 : -90))
+                }
+                .padding()
+                .background(Color(.secondarySystemBackground))
             }
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            .background(Color(.secondarySystemBackground))
+            .buttonStyle(.plain)
             
-            Divider()
-            
-            // リスト表示
-            LazyVStack(spacing: 0) {
-                ForEach(Array(sortedStats.enumerated()), id: \.element.id) { index, stat in
-                    let prevStat = index + 1 < sortedStats.count ? sortedStats[index + 1] : nil
+            if isExpanded {
+                Divider()
+                
+                // ヘッダー行
+                HStack(spacing: 8) {
+                    Text("日付")
+                        .frame(width: dateWidth, alignment: .leading)
                     
-                    HistoryRowView(
-                        stat: stat,
-                        previousStat: prevStat,
-                        mode: mode,
-                        dateWidth: dateWidth,
-                        badgeWidth: badgeWidth
-                    )
+                    Text("変動")
+                        .frame(width: badgeWidth, alignment: .trailing)
                     
-                    // 区切り線
-                    if index < sortedStats.count - 1 {
-                        Divider()
-                            .padding(.leading, 16)
+                    Text(mode == .subscribers ? "登録者数" : "再生回数")
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .background(Color(.secondarySystemBackground))
+                
+                Divider()
+                
+                // リスト表示
+                LazyVStack(spacing: 0) {
+                    ForEach(Array(sortedStats.enumerated()), id: \.element.id) { index, stat in
+                        let prevStat = index + 1 < sortedStats.count ? sortedStats[index + 1] : nil
+                        
+                        HistoryRowView(
+                            stat: stat,
+                            previousStat: prevStat,
+                            mode: mode,
+                            dateWidth: dateWidth,
+                            badgeWidth: badgeWidth
+                        )
+                        
+                        // 区切り線
+                        if index < sortedStats.count - 1 {
+                            Divider()
+                                .padding(.leading, 16)
+                        }
                     }
                 }
+                .transition(.opacity)
             }
         }
         .background(Color(.systemBackground))
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 5)
+        .clipped()
     }
 }
 

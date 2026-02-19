@@ -92,6 +92,9 @@ struct ChannelDetailView: View {
                         .transition(.opacity)
                     }
                 }
+
+                DiffChartView(stats: channel.stats, mode: selection)
+                    .padding(.horizontal)
                 
                 HistoryListView(stats: channel.stats, mode: selection)
                     .padding(.horizontal)
